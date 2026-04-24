@@ -1,0 +1,34 @@
+INITIAL ALERT:
+{alert}
+
+AGENT 1 SUMMARY (detected pattern):
+{summary}
+
+HISTORICAL CONTEXT ROUND 1:
+{tour1}
+
+DEEP INVESTIGATION ROUND 2:
+{tour2}
+
+Respond ONLY in valid JSON without backticks:
+{{
+  "risk_score": <integer between 0 (no risk) and 10 (critical)>,
+  "verdict": "<CONFIRMED_ATTACK|PROBABLE_ATTACK|FALSE_POSITIVE|NEEDS_INVESTIGATION>",
+  "attack_type": "<brief description of the identified attack type>",
+  "mitre_techniques": ["<T-ID: technique name>", "<add more if relevant>"],
+  "timeline": [
+    {{"event": "<what happened>", "timestamp": "<ISO 8601 or N/A>"}},
+    "<add one entry per significant event>"
+  ],
+  "recommended_actions": [
+    "<concrete action for the SOC team>",
+    "<add as many as needed>"
+  ],
+  "summary": "<exactly 2 sentences summarizing the threat for a SOC analyst>"
+}}
+
+Rules:
+- verdict MUST be one of: CONFIRMED_ATTACK / PROBABLE_ATTACK / FALSE_POSITIVE / NEEDS_INVESTIGATION
+- risk_score MUST be an integer 0-10
+- mitre_techniques MUST use real MITRE ATT&CK IDs from the full Enterprise framework
+- Do NOT copy the placeholder text above, replace with real values based on the evidence
