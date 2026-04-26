@@ -37,31 +37,30 @@ def Search_index(query_json:str,index_name:str="wazuh-archive",size:int=10)->str
         return f"Error executing search on index '{index_name}': {str(e)}"
         '''
 @mcp.tool()
-def msearch_tool(queries_json: list[str], index_name: str = "wazuh-archive") -> str:
+def search_wazuh(lucene_query: str, index_name: str = "wazuh-archive") -> str:
     """
-    Execute multiple OpenSearch queries at once (Multi-Search) to gather deep context.
-    Agent: Use this tool to run multiple DSL queries simultaneously against the archives.
+    Search the OpenSearch archives using a Lucene query string.
+    Agent: Use this tool to search for alerts, logs, and events.
     
     Args:
-        queries_json: A list of valid JSON strings, where each string is an OpenSearch query body.
-        index_name: The target index. Defaults to 'wazuh-archives-*'.
+        lucene_query: A valid Lucene query string (e.g. 'rule.description:"SSH failed" AND data.srcip:"192.168.100.30"').
+        index_name: The target index. Defaults to 'wazuh-archive'.
     """
     try:
         client = get_client()
-        body = []
-        for q_str in queries_json:
-            query = json.loads(q_str)
-            # msearch requires pairs of {"index": index_name} and the actual query body
-            body.append({"index": index_name})
-            body.append(query)
-            
-        response = client.msearch(body=body)
+        query_body = {
+            "size": 10,
+            "query": {
+                "query_string": {
+                    "query": lucene_query
+                }
+            }
+        }
         
-        # Extract just the hits from each response to reduce context bloat
-        results = [resp.get("hits", {}) for resp in response.get("responses", [])]
-        return json.dumps(results, indent=2)
+        response = client.search(index=index_name, body=query_body)
         
-    except json.JSONDecodeError as e:
-        return f"Error parsing a query in queries_json. Error: {str(e)}"
+        # Extract just the hits from the response to reduce context bloat
+        hits = response.get("hits", {})
+        return json.dumps(hits, indent=2)
     except Exception as e:
-        return f"Error executing msearch: {str(e)}"
+        return f"Error executing search: {str(e)}"
