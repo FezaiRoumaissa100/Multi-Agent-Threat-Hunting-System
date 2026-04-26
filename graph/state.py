@@ -32,7 +32,7 @@ class SOCState(TypedDict):
     # Summary of the pattern detected by Agent 1
 
     # Agent 3 → Agent 4
-    results_round2: Optional[dict]
+    results_round2: Annotated[List[dict], operator.add]
     # Detailed activities from wazuh-archives-*
 
     # Agent 4 → SOC Analyst

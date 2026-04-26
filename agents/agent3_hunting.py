@@ -7,7 +7,8 @@ from mcp.client.stdio import stdio_client
 from mcp import ClientSession
 from langchain_mcp_adapters.tools import load_mcp_tools
 import json
-async def main():
+from graph.state import SOCState
+async def agent3_node(state: SOCState):
     # 1. Define how to connect
     server_params = StdioServerParameters(
         command="python",
@@ -102,9 +103,9 @@ Rules:
                 final_response = await agent3_llm_with_tools.ainvoke(prompt)
                 print("\n--- Final Answer ---")
                 print(final_response.content)    
-                return {"results_round2":{"raw_results":tool_result_collected,"analysis":final_response.content}}
+                return {"results_round2": [{"raw_results":tool_result_collected,"analysis":final_response.content}]}
                 
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    asyncio.run(agent3_node())
