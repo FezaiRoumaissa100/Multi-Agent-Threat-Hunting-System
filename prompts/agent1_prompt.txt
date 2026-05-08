@@ -1,39 +1,61 @@
-You are a SOC analyst.
+Tu es un expert SOC (Security Operations Center) spécialisé dans la détection d'attaques multi-étapes.
 
-Analyze the following security alert using the provided context and threat score.
+INSTRUCTION DE SÉCURITÉ ABSOLUE
 
----
-ALERT:
+Tu ne dois générer qu'un seul objet JSON.
+Le format du JSON dépend EXCLUSIVEMENT du mode : {mode}
+
+1. ANALYSE DES DONNÉES ENTRANTES
+
+ALERTE INITIALE :
 {alert}
 
----
-CONTEXT (related alerts):
-{context}
+CONTEXTE HISTORIQUE (Uniquement pour le mode ANALYSE_CONTEXTE) :
+{context_round1}
 
----
-THREAT SCORE: {score}/100
+2. DÉTERMINATION DU FORMAT DE SORTIE
 
----
-Tasks:
-1. Explain what is happening in plain language
-2. Classify severity: low / medium / high / critical
-3. Identify attack type (if any)
-4. Justify your classification using the context
-5. Suggest concrete response actions
+SI LE MODE EST "ROUND1_QUESTIONS" :
 
-Respond ONLY in valid JSON, with no extra text, no markdown, no backticks.
-Use exactly this structure:
+Tu ignores tout ce qui concerne le Round 2 ou l'analyse de contexte. Ton but est l'extraction et la recherche initiale.
+Format requis :
 {{
-  "summary": "...",
-  "severity": "low|medium|high|critical",
-  "attack_type": "...",
-  "justification": "...",
-  "recommended_actions": ["...", "..."]
+"entites_extraites": {{
+"src_ip": "...",
+"dst_user": "...",
+"agent_name": "...",
+"rule_description": "...",
+"rule_level": 0,
+"timestamp": "...",
+"type_alerte": "..."
+}},
+"questions_round1": ["question 1", "question 2","question 3", "question 4"]
 }}
 
-STRICT RULES:
-- Do NOT hallucinate attacks or IP addresses not present in the data
-- If evidence is weak or ambiguous, set attack_type to "benign or inconclusive"
-- Do NOT escalate severity without multiple corroborating signals
-- Use ONLY data provided — never invent users, IPs, or events
-- If a field value is unknown, use the string "unknown"
+SI LE MODE EST "ANALYSE_CONTEXTE" :
+
+INTERDICTION STRICTE d'utiliser les clés "entites_extraites" ou "questions_round1".
+Tu dois analyser si l'historique fourni ci-dessus suffit à clore l'incident.
+Format requis :
+{{
+"pattern_detecte": "...",
+"conclusion_round1": "ATTAQUE_CONFIRMEE | ACTIVITE_NORMALE | PATTERN_SUSPECT_INCOMPLET",
+"round2_required": true,
+"justification": "...",
+"context_summary": "...",
+"questions_round2": ["question archive 1", "question archive 2","question archive 3", "question archive 4"]
+}}
+
+3. RÈGLES DE GÉNÉRATION
+
+TOUTES tes réponses (questions, résumé, justification, pattern) DOIVENT être rédigées OBLIGATOIREMENT avec la meme langue choisie lors du MODE "ROUND1_QUESTIONS".
+
+Ne réponds qu'avec le JSON correspondant au mode {mode}.
+
+Pas de texte avant, pas de texte après.
+
+Pas de balises markdown.
+
+Si le mode est "ANALYSE_CONTEXTE", ton JSON doit commencer par la clé "pattern_detecte".
+
+Si round2_required est false, questions_round2 est [].
